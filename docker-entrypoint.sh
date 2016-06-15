@@ -51,9 +51,7 @@ if [ "$1" = "qpidd" ]; then
 
         mkdir -p "$QDROUTERD_SSL_DB_DIR"
 
-        if [ -z "$QDROUTERD_SSL_DB_PASSWORD" ]; then
-            QDROUTERD_SSL_DB_PASSWORD="$(date +%s | sha256sum | base64 | head -c 32 ; echo)"
-
+        if [ "$QDROUTERD_SSL_DB_PASSWORD" ]; then
             # Password file
             touch $QDROUTERD_SSL_DB_DIR/pwdfile
             echo "$QDROUTERD_SSL_DB_PASSWORD" > $QDROUTERD_SSL_DB_DIR/pwdfile

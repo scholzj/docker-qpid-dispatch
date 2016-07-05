@@ -82,7 +82,7 @@ if [ "$1" = "qdrouterd" ]; then
     mkdir -p "$(dirname $QDROUTERD_SASL_DB)"
 
     if [[ "$QDROUTERD_ADMIN_USERNAME" && "$QDROUTERD_ADMIN_PASSWORD" ]]; then
-        echo "$QDROUTERD_ADMIN_PASSWORD" | saslpasswd2 -f "$QDROUTERD_SASL_DB" -u QDROUTERD -p "$QDROUTERD_ADMIN_USERNAME"
+        echo "$QDROUTERD_ADMIN_PASSWORD" | saslpasswd2 -f "$QDROUTERD_SASL_DB" -p "$QDROUTERD_ADMIN_USERNAME"
         sasl_plain=1
     fi
 

@@ -10,13 +10,15 @@ if [ "$1" = "qpidd" ]; then
     sasl_external=0
     sasl_plain=0
     have_ssl=0
-    have_acl=0
+    have_policy=0
     have_sasl=0
     have_sslauthpeer=0
 
     have_config=0
 
+    #####
     # Home dir
+    #####
     if [ -z "$QDROUTERD_HOME" ]; then
         QDROUTERD_HOME="/var/lib/qdrouterd"
     fi
@@ -27,18 +29,10 @@ if [ "$1" = "qpidd" ]; then
     fi
 
     #####
-    # If SASL database already exists, change the password only when it was provided from outside.
-    # If it doesn't exist, create it either with password from env or with default password
+    # Router ID
     #####
-    if [ -z "$QDROUTERD_SASL_DB"]; then
-        QDROUTERD_SASL_DB="$QDROUTERD_HOME/etc/sasl/qdrouterd.sasldb"
-    fi
-    
-    mkdir -p "$(dirname $QDROUTERD_SASL_DB)"
-
-    if [[ "$QDROUTERD_ADMIN_USERNAME" && "$QDROUTERD_ADMIN_PASSWORD" ]]; then
-        echo "$QDROUTERD_ADMIN_PASSWORD" | saslpasswd2 -f "$QDROUTERD_SASL_DB" -u QDROUTERD -p "$QDROUTERD_ADMIN_USERNAME"
-        sasl_plain=1
+    if [ -z "$QDROUTERD_ID" ]; then
+        QDROUTERD_ID="$(date +%s | sha256sum | base64 | head -c 32 ; echo)"
     fi
 
     #####
@@ -79,15 +73,33 @@ if [ "$1" = "qpidd" ]; then
     fi
 
     #####
+    # If SASL database already exists, change the password only when it was provided from outside.
+    #####
+    if [ -z "$QDROUTERD_SASL_DB" ]; then
+        QDROUTERD_SASL_DB="$QDROUTERD_HOME/etc/sasl/qdrouterd.sasldb"
+    fi
+
+    mkdir -p "$(dirname $QDROUTERD_SASL_DB)"
+
+    if [[ "$QDROUTERD_ADMIN_USERNAME" && "$QDROUTERD_ADMIN_PASSWORD" ]]; then
+        echo "$QDROUTERD_ADMIN_PASSWORD" | saslpasswd2 -f "$QDROUTERD_SASL_DB" -u QDROUTERD -p "$QDROUTERD_ADMIN_USERNAME"
+        sasl_plain=1
+    fi
+
+    #####
     # Create SASL config if it doesn't exist, create it
     #]####
     if [ -z "$QDROUTERD_SASL_CONFIG_DIR" ]; then
         QDROUTERD_SASL_CONFIG_DIR="$QDROUTERD_HOME/etc/sasl/"
     fi
+
+    if [ -z "$QDROUTERD_SASL_CONFIG_NAME" ]; then
+        QDROUTERD_SASL_CONFIG_NAME="qdrouterd"
+    fi
     
-    if [ ! -f "$QDROUTERD_SASL_CONFIG_DIR/qdrouterd.conf" ]; then
+    if [ ! -f "$QDROUTERD_SASL_CONFIG_DIR/$QDROUTERD_SASL_CONFIG_NAME.conf" ]; then
         if [[ $sasl_plain -eq 1 || $sasl_external -eq 1 ]]; then
-            mkdir -p "$(dirname $QDROUTERD_SASL_CONFIG_DIR)"
+            mkdir -p "$QDROUTERD_SASL_CONFIG_DIR"
         
             mechs=""
     
@@ -99,7 +111,7 @@ if [ "$1" = "qpidd" ]; then
                 mechs="EXTERNAL $mechs"
             fi
     
-            cat > $QDROUTERD_SASL_CONFIG_DIR/qdrouterd.conf <<-EOS
+            cat > $QDROUTERD_SASL_CONFIG_DIR/$QDROUTERD_SASL_CONFIG_NAME.conf <<-EOS
 mech_list: $mechs
 pwcheck_method: auxprop
 auxprop_plugin: sasldb
@@ -111,23 +123,30 @@ EOS
     fi
 
     #####
-    # Create ACL file - if user was set and the ACL env var not, generate it.
+    # Create policy file
     #####
-    if [ -z "$QDROUTERD_ACL_FILE" ]; then
-        QDROUTERD_ACL_FILE="$QDROUTERD_HOME/etc/qpidd.acl"
+    if [ -z "$QDROUTERD_POLICY_DIR" ]; then
+        QDROUTERD_POLICY_DIR="$QDROUTERD_HOME/etc/auth-policy/"
     fi
 
-    if [ "$QDROUTERD_ACL_RULES" ]; then
-        echo $QDROUTERD_ACL_RULES > $QDROUTERD_ACL_FILE
-        have_acl=1
-    elif [ $QDROUTERD_ADMIN_USERNAME ]; then
-        if [ ! -f "$QDROUTERD_ACL_FILE" ]; then
-            cat > $QDROUTERD_ACL_FILE <<-EOS
-acl allow $QDROUTERD_ADMIN_USERNAME@QPID all
-acl deny-log all all
-EOS
-            have_acl=1
-        fi
+    if [ "$QDROUTERD_POLICY_RULES" ]; then
+        mkdir -p "$QDROUTERD_POLICY_DIR"
+        echo $QDROUTERD_POLICY_RULES | envsubst > ${QDROUTERD_POLICY_DIR}/default-policy.json
+        have_policy=1
+    fi
+
+    #####
+    # Maximum number of connections
+    #####
+    if [ -z "$QDROUTERD_MAX_CONNECTIONS" ]; then
+        QDROUTERD_MAX_CONNECTIONS="0"
+    fi
+
+    #####
+    # Worker threads
+    #####
+    if [ -z "$QDROUTERD_WORKER_THREADS" ]; then
+        QDROUTERD_WORKER_THREADS="4"
     fi
 
     #####
@@ -138,43 +157,118 @@ EOS
     fi
 
     if [ "$QDROUTERD_CONFIG_OPTIONS" ]; then
-        echo $QDROUTERD_CONFIG_OPTIONS > $QDROUTERD_CONFIG_FILE
+        echo $QDROUTERD_CONFIG_OPTIONS | envsubst > $QDROUTERD_CONFIG_FILE
     else
         if [ ! -f "$QDROUTERD_CONFIG_FILE" ]; then
+            have_config=1
+
+            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+router {
+    mode: standalone
+    id: $QDROUTERD_ID
+    workerThreads: $QDROUTERD_WORKER_THREADS
+EOS
+
             if [ $have_sasl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-sasl-config=$QDROUTERD_SASL_CONFIG_DIR
+    saslConfigPath: $QDROUTERD_SASL_CONFIG_DIR
+    saslConfigName: $QDROUTERD_SASL_CONFIG_NAME
 EOS
-                have_config=1
             fi
 
-            if [ $have_acl -eq "1" ]; then
-                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-acl-file=$QDROUTERD_ACL_FILE
+            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+}
 EOS
-                have_config=1
+
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+policy {
+    maximumConnections: $QDROUTERD_MAX_CONNECTIONS
+EOS
+            if [ $have_policy -eq "1" ]; then
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    enableAccessRules: true
+    policyFolder: $QDROUTERD_POLICY_DIR
+    defaultApplication: default
+    defaultApplicationEnabled: true
+EOS
+            fi
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+}
+EOS
+
+            if [ $sasl_plain -eq "1" ]; then
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+listener {
+    role: normal
+    host: 0.0.0.0
+    port: amqp
+    saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
+}
+EOS
             fi
 
             if [ $have_ssl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-ssl-cert-password-file=$QDROUTERD_SSL_DB_PASSWORD_FILE
-ssl-cert-name=serverKey
-ssl-cert-db=sql:$QDROUTERD_SSL_DB_DIR
+listener {
+    role: normal
+    host: 0.0.0.0
+    port: amqps
+    requireSsl: yes
+    certFile: $QDROUTERD_SSL_DB_DIR/serverKey.crt
+    keyFile: $QDROUTERD_SSL_DB_DIR/serverKey.pem
+
+    authenticatePeer: yes
+
+    uidFormat: 5
 EOS
-                have_config=1
+
+                if [ "$QDROUTERD_SSL_DB_PASSWORD_FILE" ]; then
+                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    passwordFile: $QDROUTERD_SSL_DB_PASSWORD_FILE
+EOS
+                fi
+
+                if [ "$QDROUTERD_SSL_CERT_DB" ]; then
+                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    certDb: $QDROUTERD_SSL_CERT_DB
+EOS
+                fi
+
+                if [ "$QDROUTERD_SSL_TRUSTED_CERTS" ]; then
+                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    trustedCerts: $QDROUTERD_SSL_TRUSTED_CERTS
+EOS
+                fi
 
                 if [ $sasl_external -eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-ssl-require-client-authentication=yes
+    saslMechanisms: EXTERNAL
+EOS
+                else
+                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
 EOS
                 fi
 
                 if [ $sasl_sslauthpeer-eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
---ssl-sasl-no-dict=yes
+    authenticatePeer: yes
 EOS
                 fi
+
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+}
+EOS
             fi
+
+            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+log {
+     module: DEFAULT
+     enable: trace+
+     timestamp: true
+}
+EOS
+
         fi
     fi
 

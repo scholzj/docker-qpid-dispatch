@@ -45,3 +45,11 @@ sslPort() {
     run docker exec -i $cont qdstat -g -b 127.0.0.1:5672
     [ "$status" -eq "0" ]
 }
+
+@test "Username/password connections" {
+    cont=$(docker run -P -e QDROUTERD_ADMIN_USERNAME=admin -e QDROUTERD_ADMIN_PASSWORD=123456 -d $IMAGE:$VERSION)
+    port=$(tcpPort)
+    sleep 5 # give the image time to start
+    run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5672
+    [ "$status" -eq "0" ]
+}

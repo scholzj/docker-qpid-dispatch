@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-# if command starts with an option, prepend qpidd
+# if command starts with an option, prepend qdrouterd
 if [ "${1:0:1}" = '-' ]; then
     set -- qdrouterd "$@"
 fi
 
-if [ "$1" = "qpidd" ]; then
+if [ "$1" = "qdrouterd" ]; then
     sasl_external=0
     sasl_plain=0
     have_ssl=0
@@ -60,14 +60,14 @@ if [ "$1" = "qpidd" ]; then
              echo "$QDROUTERD_SSL_CERT_DB" > $QDROUTERD_SSL_DB_DIR/certDb.crt
              if [ "$QDROUTERD_SSL_TRUSTED_CERTS" ]; then
                  echo "$QDROUTERD_SSL_TRUSTED_CERTS" > $QDROUTERD_SSL_DB_DIR/trustedCerts.crt
-             fi 
-     
+             fi
+
              if [ "$QDROUTERD_SSL_AUTHENTICATE_PEER" ]; then
                  have_sslauthpeer=1
              fi
 
              sasl_external=1
-        fi 
+        fi
 
         have_ssl=1
     fi
@@ -96,21 +96,21 @@ if [ "$1" = "qpidd" ]; then
     if [ -z "$QDROUTERD_SASL_CONFIG_NAME" ]; then
         QDROUTERD_SASL_CONFIG_NAME="qdrouterd"
     fi
-    
+
     if [ ! -f "$QDROUTERD_SASL_CONFIG_DIR/$QDROUTERD_SASL_CONFIG_NAME.conf" ]; then
         if [[ $sasl_plain -eq 1 || $sasl_external -eq 1 ]]; then
             mkdir -p "$QDROUTERD_SASL_CONFIG_DIR"
-        
+
             mechs=""
-    
+
             if [ $sasl_plain -eq 1 ]; then
                 mechs="PLAIN DIGEST-MD5 CRAM-MD5 $mechs"
             fi
-        
+
             if [ $sasl_external -eq 1 ]; then
                 mechs="EXTERNAL $mechs"
             fi
-    
+
             cat > $QDROUTERD_SASL_CONFIG_DIR/$QDROUTERD_SASL_CONFIG_NAME.conf <<-EOS
 mech_list: $mechs
 pwcheck_method: auxprop

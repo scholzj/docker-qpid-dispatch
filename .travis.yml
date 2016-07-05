@@ -1,0 +1,22 @@
+language: bash
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -q
+  - sudo apt-get install -q bats
+
+script:
+  - docker build -t scholzj/qpid-dispatch:devel .
+  - bats tests.bats
+
+# after_success:
+#   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+#   - docker tag -f scholzj/qpid-cpp-gui:travis docker.io/scholzj/qpid-cpp-gui:0.32
+#   - docker tag -f scholzj/qpid-cpp-gui:travis docker.io/scholzj/qpid-cpp-gui:latest
+#   - docker push docker.io/scholzj/qpid-cpp-gui:0.32
+#   - docker push docker.io/scholzj/qpid-cpp-gui:latest

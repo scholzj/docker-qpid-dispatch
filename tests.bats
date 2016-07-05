@@ -38,10 +38,10 @@ sslPort() {
     [ "$mc" -eq "1" ]
 }
 
-#@test "Config file through env variable" {
-#    cont=$(sudo docker run -P -e QDROUTERD_CONFIG_OPTIONS="$CONFIG_ANONYMOUS" -d $IMAGE:$VERSION)
-#    port=$(tcpPort)
-#    sleep 5 # give the image time to start
-#    run qpid-config -b localhost:$port list queue
-#    [ "$status" -eq "0" ]
-#}
+@test "Config file through env variable" {
+    cont=$(docker run -P -e QDROUTERD_CONFIG_OPTIONS="$CONFIG_ANONYMOUS" -d $IMAGE:$VERSION)
+    port=$(tcpPort)
+    sleep 5 # give the image time to start
+    run docker exec -i $cont qdstat -g -b 127.0.0.1:5672
+    [ "$status" -eq "0" ]
+}

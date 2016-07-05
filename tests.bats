@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 IMAGE="scholzj/qpid-dispatch"
-VERSION="devel"
+VERSION="travis"
 
 IFSBAK=$IFS
 IFS=""

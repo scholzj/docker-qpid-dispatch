@@ -216,10 +216,6 @@ listener {
     requireSsl: yes
     certFile: $QDROUTERD_SSL_DB_DIR/serverKey.crt
     keyFile: $QDROUTERD_SSL_DB_DIR/serverKey.pem
-
-    authenticatePeer: yes
-
-    uidFormat: 5
 EOS
 
                 if [ "$QDROUTERD_SSL_DB_PASSWORD_FILE" ]; then
@@ -230,13 +226,13 @@ EOS
 
                 if [ "$QDROUTERD_SSL_CERT_DB" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    certDb: $QDROUTERD_SSL_CERT_DB
+    certDb: $QDROUTERD_SSL_DB_DIR/certDb.crt
 EOS
                 fi
 
                 if [ "$QDROUTERD_SSL_TRUSTED_CERTS" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    trustedCerts: $QDROUTERD_SSL_TRUSTED_CERTS
+    trustedCerts: $QDROUTERD_SSL_DB_DIR/trustedCerts.crt
 EOS
                 fi
 
@@ -250,7 +246,7 @@ EOS
 EOS
                 fi
 
-                if [ $sasl_sslauthpeer-eq "1" ]; then
+                if [ $have_sslauthpeer -eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     authenticatePeer: yes
 EOS
@@ -268,7 +264,7 @@ log {
      timestamp: true
 }
 EOS
-
+        cat $QDROUTERD_CONFIG_FILE
         fi
     fi
 

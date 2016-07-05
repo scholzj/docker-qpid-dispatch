@@ -131,7 +131,7 @@ EOS
 
     if [ "$QDROUTERD_POLICY_RULES" ]; then
         mkdir -p "$QDROUTERD_POLICY_DIR"
-        echo $QDROUTERD_POLICY_RULES | envsubst > ${QDROUTERD_POLICY_DIR}/default-policy.json
+        echo $QDROUTERD_POLICY_RULES > ${QDROUTERD_POLICY_DIR}/default-policy.json
         have_policy=1
     fi
 
@@ -157,7 +157,7 @@ EOS
     fi
 
     if [ "$QDROUTERD_CONFIG_OPTIONS" ]; then
-        echo $QDROUTERD_CONFIG_OPTIONS | envsubst > $QDROUTERD_CONFIG_FILE
+        echo $QDROUTERD_CONFIG_OPTIONS > $QDROUTERD_CONFIG_FILE
     else
         if [ ! -f "$QDROUTERD_CONFIG_FILE" ]; then
             have_config=1
@@ -180,7 +180,7 @@ EOS
 }
 EOS
 
-                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 policy {
     maximumConnections: $QDROUTERD_MAX_CONNECTIONS
 EOS

@@ -8,6 +8,7 @@ IFS=""
 SERVER_PUBLIC_KEY=$(cat ./tests/localhost.crt)
 SERVER_PRIVATE_KEY=$(cat ./tests/localhost.key)
 CLIENT_KEY_DB=$(cat ./tests/certs.db)
+AUTH_POLICY=$(cat ./tests/authorization-policy.json)
 CONFIG_ANONYMOUS=$(cat ./tests/qdrouterd-anonymous.conf)
 IFS=$IFSBAK
 
@@ -110,5 +111,22 @@ sslPort() {
     docker cp ./tests/wrong_user.key ${cont}:/var/lib/qdrouterd/wrong_user.key
     run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/wrong_user.crt --ssl-key=/var/lib/qdrouterd/wrong_user.key
     echo "Output2: $output"
+    [ "$status" -ne "0" ]
+}
+
+@test "Authorization policy" {
+    cont=$(docker run -P -e QDROUTERD_ADMIN_USERNAME=admin -e QDROUTERD_ADMIN_PASSWORD=123456 -e QDROUTERD_SSL_SERVER_PUBLIC_KEY="$SERVER_PUBLIC_KEY"  -e QDROUTERD_SSL_SERVER_PRIVATE_KEY="$SERVER_PRIVATE_KEY" -e QDROUTERD_SSL_CERT_DB="$CLIENT_KEY_DB" -e QDROUTERD_POLICY_RULES="AUTH_POLICY" -d $IMAGE:$VERSION)
+    port=$(sslPort)
+    sleep 5 # give the image time to start
+
+    run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5672
+    [ "$status" -eq "0" ]
+
+    docker cp ./tests/localhost.crt ${cont}:/var/lib/qdrouterd/localhost.crt
+    docker cp ./tests/user1.crt ${cont}:/var/lib/qdrouterd/user1.crt
+    docker cp ./tests/user1.key ${cont}:/var/lib/qdrouterd/user1.key
+    run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user1.crt --ssl-key=/var/lib/qdrouterd/user1.key
+    echo "Output1: $output"
+    docker logs $cont
     [ "$status" -ne "0" ]
 }

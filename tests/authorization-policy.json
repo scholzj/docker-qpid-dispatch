@@ -1,0 +1,37 @@
+[
+    ["policyRuleset",
+        {
+            "applicationName": "default",
+            "maxConnections": 100,
+            "maxConnPerUser": 10,
+            "maxConnPerHost": 10,
+            "userGroups": {
+                "users": "user1",
+                "admins": "admin,user2"
+            },
+            "ingressHostGroups": {
+                "localhost": "127.0.0.1, ::1",
+                "everywhere": "*"
+            },
+            "ingressPolicies": {
+                "users": "everywhere",
+                "admins": "everywhere"
+            },
+            "connectionAllowDefault": false,
+            "settings": {
+                "users": {
+                    "maxSessions": 100,
+                    "maxSenders": 0,
+                    "maxReceivers": 100,
+                    "sources": "address.*",
+                    "targets": "address.*"
+                },
+                "admins": {
+                    "allowDynamicSrc": true,
+                    "sources": "$management",
+                    "targets": "$management"
+                }
+            }
+        }
+    ]
+]

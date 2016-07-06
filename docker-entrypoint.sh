@@ -175,6 +175,8 @@ EOS
     saslConfigName: $QDROUTERD_SASL_CONFIG_NAME
 EOS
             fi
+
+            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 }
 EOS
 

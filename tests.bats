@@ -9,6 +9,7 @@ SERVER_PUBLIC_KEY=$(cat ./tests/localhost.crt)
 SERVER_PRIVATE_KEY=$(cat ./tests/localhost.key)
 CLIENT_KEY_DB=$(cat ./tests/certs.db)
 AUTH_POLICY=$(cat ./tests/authorization-policy.json)
+CONFIG_INSET=$(cat ./tests/qdrouterd-inset.conf)
 CONFIG_ANONYMOUS=$(cat ./tests/qdrouterd-anonymous.conf)
 IFS=$IFSBAK
 
@@ -158,4 +159,13 @@ sslPort() {
     docker logs $cont
     # user2 is allowed to access management
     [ "$status" -eq "0" ]
+}
+
+@test "Config inset" {
+    cont=$(docker run -P -e QDROUTERD_ADMIN_USERNAME=admin -e QDROUTERD_ADMIN_PASSWORD=123456 -e QDROUTERD_CONFIG_INSET="$CONFIG_INSET" -d $IMAGE:$VERSION)
+    port=$(sslPort)
+    sleep 5 # give the image time to start
+
+    inset=$(docker exec -i $cont qdstat -a -b admin:123456@127.0.0.1:5672 | grep "myAddress" | wc -l)
+    [ "$inset" -eq "1" ]
 }

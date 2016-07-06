@@ -175,8 +175,6 @@ EOS
     saslConfigName: $QDROUTERD_SASL_CONFIG_NAME
 EOS
             fi
-
-            cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 }
 EOS
 
@@ -270,7 +268,12 @@ log {
      timestamp: true
 }
 EOS
-        cat $QDROUTERD_CONFIG_FILE
+
+            if [ "$QDROUTERD_CONFIG_INSET" ]; then
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+$QDROUTERD_CONFIG_INSET
+EOS
+            fi
         fi
     fi
 

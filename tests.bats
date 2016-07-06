@@ -120,6 +120,7 @@ sslPort() {
     sleep 5 # give the image time to start
 
     run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5672
+    # admin is allowed to access management
     [ "$status" -eq "0" ]
 
     docker cp ./tests/localhost.crt ${cont}:/var/lib/qdrouterd/localhost.crt
@@ -128,5 +129,33 @@ sslPort() {
     run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user1.crt --ssl-key=/var/lib/qdrouterd/user1.key
     echo "Output1: $output"
     docker logs $cont
+    # user1 is not allowed to access management
     [ "$status" -ne "0" ]
+}
+
+@test "UID format" {
+    cont=$(docker run -P -e QDROUTERD_ADMIN_USERNAME=admin -e QDROUTERD_ADMIN_PASSWORD=123456 -e QDROUTERD_SSL_SERVER_PUBLIC_KEY="$SERVER_PUBLIC_KEY"  -e QDROUTERD_SSL_SERVER_PRIVATE_KEY="$SERVER_PRIVATE_KEY" -e QDROUTERD_SSL_CERT_DB="$CLIENT_KEY_DB" -e QDROUTERD_POLICY_RULES="AUTH_POLICY" -e QDROUTERD_SSL_UID_FORMAT="c" -d $IMAGE:$VERSION)
+    port=$(sslPort)
+    sleep 5 # give the image time to start
+
+    run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5672
+    [ "$status" -eq "0" ]
+
+    docker cp ./tests/localhost.crt ${cont}:/var/lib/qdrouterd/localhost.crt
+    docker cp ./tests/user1.crt ${cont}:/var/lib/qdrouterd/user1.crt
+    docker cp ./tests/user1.key ${cont}:/var/lib/qdrouterd/user1.key
+    run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user1.crt --ssl-key=/var/lib/qdrouterd/user1.key
+    echo "Output1: $output"
+    docker logs $cont
+    # user1 is not allowed to access management
+    [ "$status" -ne "0" ]
+
+    docker cp ./tests/localhost.crt ${cont}:/var/lib/qdrouterd/localhost.crt
+    docker cp ./tests/user2.crt ${cont}:/var/lib/qdrouterd/user2.crt
+    docker cp ./tests/user2.key ${cont}:/var/lib/qdrouterd/user2.key
+    run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user2.crt --ssl-key=/var/lib/qdrouterd/user2.key
+    echo "Output1: $output"
+    docker logs $cont
+    # user2 is allowed to access management
+    [ "$status" -eq "0" ]
 }

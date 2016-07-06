@@ -246,6 +246,12 @@ EOS
 EOS
                 fi
 
+                if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
+                  cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    uidFormat: $QDROUTERD_SSL_UID_FORMAT
+EOS
+                fi
+
                 if [ $have_sslauthpeer -eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     authenticatePeer: yes

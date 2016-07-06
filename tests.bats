@@ -166,6 +166,6 @@ sslPort() {
     port=$(sslPort)
     sleep 5 # give the image time to start
 
-    inset=$(docker exec -i $cont qdstat -a -b admin:123456@127.0.0.1:5672 | grep "myAddress" | wc -l)
+    inset=$(docker exec -i $cont qdstat -a -b admin:123456@127.0.0.1:5672 | grep "myTestAddress" | wc -l)
     [ "$inset" -eq "1" ]
 }

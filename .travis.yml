@@ -16,5 +16,7 @@ script:
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel
-  - docker push docker.io/scholzj/qpid-dispatch:devel
+  - docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:0.6.0
+  - docker push docker.io/scholzj/qpid-dispatch:0.6.0
+  - docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:latest
+  - docker push docker.io/scholzj/qpid-dispatch:latest

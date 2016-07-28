@@ -283,7 +283,7 @@ EOS
         set -- "$@" "--config" "$QDROUTERD_CONFIG_FILE"
     fi
 
-    chown -R qdrouterd:qdrouterd "$QDROUTERD_HOME"
+    #chown -R qdrouterd:qdrouterd "$QDROUTERD_HOME"
 fi
 
 # else default to run whatever the user wanted like "bash"

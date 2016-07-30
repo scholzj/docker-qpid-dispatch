@@ -150,6 +150,13 @@ EOS
     fi
 
     #####
+    # Log level
+    #####
+    if [ -z "$QDROUTERD_LOG_LEVEL" ]; then
+        QDROUTERD_LOG_LEVEL="info+"
+    fi
+
+    #####
     # Generate broker config file if it doesn`t exist
     #####
     if [ -z "$QDROUTERD_CONFIG_FILE" ]; then
@@ -266,7 +273,7 @@ EOS
             cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 log {
      module: DEFAULT
-     enable: trace+
+     enable: $QDROUTERD_LOG_LEVEL
      timestamp: true
 }
 EOS

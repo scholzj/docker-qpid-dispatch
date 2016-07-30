@@ -150,6 +150,13 @@ EOS
     fi
 
     #####
+    # Listener link capacity
+    #####
+    if [ -z "$QDROUTERD_LISTENER_LINK_CAPACITY" ]; then
+        QDROUTERD_LISTENER_LINK_CAPACITY="1000"
+    fi
+
+    #####
     # Log level
     #####
     if [ -z "$QDROUTERD_LOG_LEVEL" ]; then
@@ -210,6 +217,7 @@ listener {
     host: 0.0.0.0
     port: amqp
     saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
+    linkCapacity: $QDROUTERD_LISTENER_LINK_CAPACITY
 }
 EOS
             fi
@@ -223,6 +231,7 @@ listener {
     requireSsl: yes
     certFile: $QDROUTERD_SSL_DB_DIR/serverKey.crt
     keyFile: $QDROUTERD_SSL_DB_DIR/serverKey.pem
+    linkCapacity: $QDROUTERD_LISTENER_LINK_CAPACITY
 EOS
 
                 if [ "$QDROUTERD_SSL_DB_PASSWORD_FILE" ]; then

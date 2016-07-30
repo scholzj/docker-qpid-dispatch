@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/scholzj/docker-qpid-dispatch.svg?branch=master)](https://travis-ci.org/scholzj/docker-qpid-dispatch)
+
 # Apache Qpid Dispatch Docker image
 
 Docker image for Apache Qpid Dispatch router. The image is based on CentOS 7.

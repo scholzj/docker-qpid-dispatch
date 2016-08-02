@@ -196,14 +196,13 @@ EOS
 
             cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 policy {
-    maximumConnections: $QDROUTERD_MAX_CONNECTIONS
+    maxConnections: $QDROUTERD_MAX_CONNECTIONS
 EOS
             if [ $have_policy -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    enableAccessRules: true
-    policyFolder: $QDROUTERD_POLICY_DIR
-    defaultApplication: default
-    defaultApplicationEnabled: true
+    enableVhostPolicy: true
+    policyDir: $QDROUTERD_POLICY_DIR
+    defaultVhost: default
 EOS
             fi
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS

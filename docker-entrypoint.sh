@@ -255,7 +255,6 @@ EOS
 
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 }
-
 listener {
     role: normal
     host: 0.0.0.0

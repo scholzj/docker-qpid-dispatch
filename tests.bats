@@ -36,7 +36,7 @@ sslPort() {
 @test "Maximum number of connections" {
     cont=$(docker run -P -e QDROUTERD_MAX_CONNECTIONS="13" -d $IMAGE:$VERSION)
     sleep 5 # give the image time to start
-    mc=$(docker exec -i $cont cat /var/lib/qdrouterd/etc/qdrouterd.conf | grep "maximumConnections: 13" | wc -l)
+    mc=$(docker exec -i $cont cat /var/lib/qdrouterd/etc/qdrouterd.conf | grep "maxConnections: 13" | wc -l)
     [ "$mc" -eq "1" ]
 }
 

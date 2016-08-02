@@ -245,6 +245,7 @@ EOS
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     trustedCerts: $QDROUTERD_SSL_DB_DIR/trustedCerts.crt
 EOS
+                fi
 
                 if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
                   cat >> $QDROUTERD_CONFIG_FILE <<-EOS

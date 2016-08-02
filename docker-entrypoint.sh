@@ -139,7 +139,7 @@ EOS
     # Maximum number of connections
     #####
     if [ -z "$QDROUTERD_MAX_CONNECTIONS" ]; then
-        QDROUTERD_MAX_CONNECTIONS="0"
+        QDROUTERD_MAX_CONNECTIONS="65535"
     fi
 
     #####

@@ -38,6 +38,6 @@ The Docker image can be configured using following environment variables:
 
 ### Policy configuration
 
-- `QDROUTERD_MAX_CONNECTIONS` defines the maximal number of connections per router. By default `0` (unlimited connections).
+- `QDROUTERD_MAX_CONNECTIONS` defines the maximal number of connections per router. By default `65535` (max integer).
 - `QDROUTERD_POLICY_DIR` defines the directory where security policies will be stored. By default `$QDROUTERD_HOME/etc/auth-policy/`.
 - `QDROUTERD_POLICY_RULES` might contain one set of policy rules in JSON format. The content of this variable will be placed into a file in the `QDROUTERD_POLICY_DIR` directory.

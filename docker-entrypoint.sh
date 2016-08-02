@@ -223,14 +223,10 @@ EOS
 
             if [ $have_ssl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-listener {
-    role: normal
-    host: 0.0.0.0
-    port: amqps
-    requireSsl: yes
+sslProfile {
+    name: ssl-listener
     certFile: $QDROUTERD_SSL_DB_DIR/serverKey.crt
     keyFile: $QDROUTERD_SSL_DB_DIR/serverKey.pem
-    linkCapacity: $QDROUTERD_LISTENER_LINK_CAPACITY
 EOS
 
                 if [ "$QDROUTERD_SSL_DB_PASSWORD_FILE" ]; then
@@ -249,7 +245,24 @@ EOS
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     trustedCerts: $QDROUTERD_SSL_DB_DIR/trustedCerts.crt
 EOS
+
+                if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
+                  cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    uidFormat: $QDROUTERD_SSL_UID_FORMAT
+EOS
                 fi
+
+                cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+}
+
+listener {
+    role: normal
+    host: 0.0.0.0
+    port: amqps
+    requireSsl: yes
+    sslProfile: ssl-listener
+    linkCapacity: $QDROUTERD_LISTENER_LINK_CAPACITY
+EOS
 
                 if [ $sasl_external -eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
@@ -258,12 +271,6 @@ EOS
                 else
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
-EOS
-                fi
-
-                if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
-                  cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    uidFormat: $QDROUTERD_SSL_UID_FORMAT
 EOS
                 fi
 

@@ -217,6 +217,7 @@ listener {
     port: amqp
     saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
     linkCapacity: $QDROUTERD_LISTENER_LINK_CAPACITY
+    authenticatePeer: yes
 }
 EOS
             fi

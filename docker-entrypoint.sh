@@ -88,7 +88,7 @@ if [ "$1" = "qdrouterd" ]; then
 
     #####
     # Create SASL config if it doesn't exist, create it
-    #]####
+    #####
     if [ -z "$QDROUTERD_SASL_CONFIG_DIR" ]; then
         QDROUTERD_SASL_CONFIG_DIR="$QDROUTERD_HOME/etc/sasl/"
     fi
@@ -274,12 +274,6 @@ EOS
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
     authenticatePeer: yes
-EOS
-                fi
-
-                if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
-                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    uidFormat: $QDROUTERD_SSL_UID_FORMAT
 EOS
                 fi
 

@@ -171,7 +171,11 @@ EOS
     fi
 
     if [ "$QDROUTERD_CONFIG_OPTIONS" ]; then
-        echo $QDROUTERD_CONFIG_OPTIONS > $QDROUTERD_CONFIG_FILE
+        #echo $QDROUTERD_CONFIG_OPTIONS > $QDROUTERD_CONFIG_FILE
+	cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+$QDROUTERD_CONFIG_OPTIONS
+EOS
+	have_config=1
     else
         if [ ! -f "$QDROUTERD_CONFIG_FILE" ]; then
             have_config=1
@@ -182,7 +186,7 @@ router {
     id: $QDROUTERD_ID
     workerThreads: $QDROUTERD_WORKER_THREADS
 EOS
-
+	
             if [ $have_sasl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslConfigPath: $QDROUTERD_SASL_CONFIG_DIR

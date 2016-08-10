@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
-IMAGE="scholzj/qpid-dispatch"
-VERSION="travis"
+IMAGE="qpid-dispatch"
+VERSION="0.6.1"
 
 IFSBAK=$IFS
 IFS=""
@@ -10,6 +10,7 @@ SERVER_PRIVATE_KEY=$(cat ./tests/localhost.key)
 CLIENT_KEY_DB=$(cat ./tests/certs.db)
 AUTH_POLICY=$(cat ./tests/authorization-policy.json)
 CONFIG_INSET=$(cat ./tests/qdrouterd-inset.conf)
+CONFIG_OPTIONS=$(cat ./tests/qdrouterd-options.conf)
 CONFIG_ANONYMOUS=$(cat ./tests/qdrouterd-anonymous.conf)
 IFS=$IFSBAK
 
@@ -25,6 +26,7 @@ tcpPort() {
 sslPort() {
     docker port $cont 5671 | cut -f 2 -d ":"
 }
+
 
 @test "Worker threads" {
     cont=$(docker run -P -e QDROUTERD_WORKER_THREADS="10" -d $IMAGE:$VERSION)
@@ -167,5 +169,15 @@ sslPort() {
     sleep 5 # give the image time to start
 
     inset=$(docker exec -i $cont qdstat -a -b admin:123456@127.0.0.1:5672 | grep "myTestAddress" | wc -l)
+    [ "$inset" -eq "1" ]
+}
+
+@test "Config options" {
+    cont=$(docker run -P -e QDROUTERD_ADMIN_USERNAME=admin -e QDROUTERD_ADMIN_PASSWORD=123456 -e QDROUTERD_CONFIG_OPTIONS="$CONFIG_OPTIONS" -d $IMAGE:$VERSION)
+    port=$(tcpPort)
+    sleep 5 # give the image time to start
+
+    inset=$(docker exec -i $cont qdstat -a -b amqp://127.0.0.1:5672 | grep "myOtherTestAddress" | wc -l)
+
     [ "$inset" -eq "1" ]
 }

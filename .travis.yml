@@ -15,6 +15,6 @@ script:
   - bats tests.bats
 
 after_success:
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel
   - docker push docker.io/scholzj/qpid-dispatch:devel

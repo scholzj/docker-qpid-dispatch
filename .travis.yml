@@ -15,6 +15,6 @@ script:
   - bats tests.bats
 
 after_success:
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel
-  - docker push docker.io/scholzj/qpid-dispatch:devel
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then docker push docker.io/scholzj/qpid-dispatch:devel; fi

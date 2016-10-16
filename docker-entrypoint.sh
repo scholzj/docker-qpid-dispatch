@@ -8,6 +8,7 @@ fi
 
 if [ "$1" = "qdrouterd" ]; then
     sasl_external=0
+    have_mapping=0
     sasl_plain=0
     have_ssl=0
     have_policy=0
@@ -64,6 +65,19 @@ if [ "$1" = "qdrouterd" ]; then
 
              if [ "$QDROUTERD_SSL_AUTHENTICATE_PEER" ]; then
                  have_sslauthpeer=1
+             fi
+
+             #####
+             # Display name mapping
+             #####
+             if [ -z "$QDROUTERD_DISPLAY_NAME_FILE"]; then
+                 have_mapping=1
+             elif [ -z "$QDROUTERD_DISPLAY_NAME_MAPPING" ]; then
+                 QDROUTERD_DISPLAY_NAME_FILE="$QDROUTERD_HOME/etc/display-name-mapping/mapping.json"
+
+                 mkdir -p "$(dirname $QDROUTERD_DISPLAY_NAME_FILE)"
+                 echo $QDROUTERD_DISPLAY_NAME_MAPPING > ${QDROUTERD_DISPLAY_NAME_FILE}
+                 have_mapping=1
              fi
 
              sasl_external=1
@@ -185,7 +199,7 @@ router {
     id: $QDROUTERD_ID
     workerThreads: $QDROUTERD_WORKER_THREADS
 EOS
-	
+
             if [ $have_sasl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslConfigPath: $QDROUTERD_SASL_CONFIG_DIR
@@ -254,6 +268,12 @@ EOS
                 if [ "$QDROUTERD_SSL_UID_FORMAT" ]; then
                   cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     uidFormat: $QDROUTERD_SSL_UID_FORMAT
+EOS
+                fi
+
+                if [ $have_mapping -eq "1" ]; then
+                  cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    displayNameFile: $QDROUTERD_DISPLAY_NAME_FILE
 EOS
                 fi
 

@@ -70,9 +70,9 @@ if [ "$1" = "qdrouterd" ]; then
              #####
              # Display name mapping
              #####
-             if [ -z "$QDROUTERD_DISPLAY_NAME_FILE"]; then
+             if [ "$QDROUTERD_DISPLAY_NAME_FILE"]; then
                  have_mapping=1
-             elif [ -z "$QDROUTERD_DISPLAY_NAME_MAPPING" ]; then
+             elif [ "$QDROUTERD_DISPLAY_NAME_MAPPING" ]; then
                  QDROUTERD_DISPLAY_NAME_FILE="$QDROUTERD_HOME/etc/display-name-mapping/mapping.json"
 
                  mkdir -p "$(dirname $QDROUTERD_DISPLAY_NAME_FILE)"

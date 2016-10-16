@@ -27,6 +27,8 @@ The Docker image can be configured using following environment variables:
 - `QDROUTERD_SSL_TRUSTED_CERTS` list of supported CAs which will be presented to the SSL clients. If not specified, `QDROUTERD_SSL_CERT_DB` will be used.
 - `QDROUTERD_SSL_AUTHENTICATE_PEER` defines whether peer authentication is required or not.
 - `QDROUTERD_SSL_UID_FORMAT` configures the mechanism which is used to create the username based on the certificate (e.g. based on CN, SHA signature etc.). For more details about the different options visit the Qpid Dispatch documentation.
+- `QDROUTERD_DISPLAY_NAME_MAPPING` configures the display name mapping file, which maps SSL certificates against usernames based on a JSON file with mapping. This variable should contain the JSON mapping as text. Do not use at the same time `QDROUTERD_DISPLAY_NAME_FILE`.
+- `QDROUTERD_DISPLAY_NAME_FILE` configures the display name mapping file, which maps SSL certificates against usernames based on a JSON file with mapping. This variable should contain the path to the mapping file, which has to be included into the image on external volume. Do not use at the same time `QDROUTERD_DISPLAY_NAME_MAPPING`.
 
 ### SASL configuration
 

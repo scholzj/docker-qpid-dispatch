@@ -8,7 +8,7 @@
             "allowUnknownUser": false,
             "groups": {
                 "users": {
-                    "users": "user1",
+                    "users": "user1,mapped1",
                     "remoteHosts": "*",
                     "maxSessions": 100,
                     "maxSenders": 0,
@@ -17,7 +17,7 @@
                     "targets": "address.*"
                 },
                 "admins": {
-                    "users": "admin,user2",
+                    "users": "admin,user2,mapped2",
                     "remoteHosts": "*",
                     "allowDynamicSource": true,
                     "sources": "$management",

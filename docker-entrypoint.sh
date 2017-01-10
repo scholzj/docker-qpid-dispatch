@@ -70,13 +70,13 @@ if [ "$1" = "qdrouterd" ]; then
              #####
              # Display name mapping
              #####
-             if [ "$QDROUTERD_DISPLAY_NAME_FILE"]; then
+             if [ "$QDROUTERD_DISPLAY_NAME_FILE" ]; then
                  have_mapping=1
              elif [ "$QDROUTERD_DISPLAY_NAME_MAPPING" ]; then
                  QDROUTERD_DISPLAY_NAME_FILE="$QDROUTERD_HOME/etc/display-name-mapping/mapping.json"
 
                  mkdir -p "$(dirname $QDROUTERD_DISPLAY_NAME_FILE)"
-                 echo $QDROUTERD_DISPLAY_NAME_MAPPING > ${QDROUTERD_DISPLAY_NAME_FILE}
+                 echo "$QDROUTERD_DISPLAY_NAME_MAPPING" > "${QDROUTERD_DISPLAY_NAME_FILE}"
                  have_mapping=1
              fi
 
@@ -145,7 +145,7 @@ EOS
 
     if [ "$QDROUTERD_POLICY_RULES" ]; then
         mkdir -p "$QDROUTERD_POLICY_DIR"
-        echo $QDROUTERD_POLICY_RULES > ${QDROUTERD_POLICY_DIR}/default-policy.json
+        echo "$QDROUTERD_POLICY_RULES" > "${QDROUTERD_POLICY_DIR}/default-policy.json"
         have_policy=1
     fi
 

@@ -290,10 +290,14 @@ EOS
 
                 if [ $sasl_external -eq "1" ]; then
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+    saslMechanisms: EXTERNAL PLAIN DIGEST-MD5 CRAM-MD5
+    authenticatePeer: yes
+EOS
+                elif [ $have_sslauthpeer -eq "1" ]; then
+                    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslMechanisms: EXTERNAL
     authenticatePeer: yes
 EOS
-                else
                     cat >> $QDROUTERD_CONFIG_FILE <<-EOS
     saslMechanisms: PLAIN DIGEST-MD5 CRAM-MD5
     authenticatePeer: yes

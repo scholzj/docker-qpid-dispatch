@@ -83,14 +83,14 @@ sslPort() {
     docker cp ./tests/localhost.crt ${cont}:/var/lib/qdrouterd/localhost.crt
     docker cp ./tests/user1.crt ${cont}:/var/lib/qdrouterd/user1.crt
     docker cp ./tests/user1.key ${cont}:/var/lib/qdrouterd/user1.key
-    run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user1.crt --ssl-key=/var/lib/qdrouterd/user1.key --ssl-disable-peer-name-verify
+    run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/user1.crt --ssl-key=/var/lib/qdrouterd/user1.key --ssl-disable-peer-name-verify --sasl-mechanism=DIGEST-MD5
     echo "Output1: $output"
     docker logs $cont
     [ "$status" -eq "0" ]
 
     docker cp ./tests/wrong_user.crt ${cont}:/var/lib/qdrouterd/wrong_user.crt
     docker cp ./tests/wrong_user.key ${cont}:/var/lib/qdrouterd/wrong_user.key
-    run docker exec -i $cont qdstat -g -b 127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/wrong_user.crt --ssl-key=/var/lib/qdrouterd/wrong_user.key --ssl-disable-peer-name-verify
+    run docker exec -i $cont qdstat -g -b admin:123456@127.0.0.1:5671 --ssl-trustfile=/var/lib/qdrouterd/localhost.crt --ssl-certificate=/var/lib/qdrouterd/wrong_user.crt --ssl-key=/var/lib/qdrouterd/wrong_user.key --ssl-disable-peer-name-verify --sasl-mechanism=DIGEST-MD5
     echo "Output2: $output"
     [ "$status" -ne "0" ]
 }

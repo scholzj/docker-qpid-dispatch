@@ -185,10 +185,10 @@ EOS
     fi
 
     if [ "$QDROUTERD_CONFIG_OPTIONS" ]; then
-	cat >> $QDROUTERD_CONFIG_FILE <<-EOS
+	    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 $QDROUTERD_CONFIG_OPTIONS
 EOS
-	have_config=1
+	    have_config=1
     else
         if [ ! -f "$QDROUTERD_CONFIG_FILE" ]; then
             have_config=1

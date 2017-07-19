@@ -15,8 +15,6 @@ if [ "$1" = "qdrouterd" ]; then
     have_sasl=0
     have_sslauthpeer=0
 
-    have_config=0
-
     #####
     # Home dir
     #####
@@ -188,11 +186,8 @@ EOS
 	    cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 $QDROUTERD_CONFIG_OPTIONS
 EOS
-	    have_config=1
     else
         if [ ! -f "$QDROUTERD_CONFIG_FILE" ]; then
-            have_config=1
-
             cat >> $QDROUTERD_CONFIG_FILE <<-EOS
 router {
     mode: standalone
@@ -325,11 +320,7 @@ EOS
         fi
     fi
 
-    if [ $have_config -eq "1" ]; then
-        set -- "$@" "--config" "$QDROUTERD_CONFIG_FILE"
-    fi
-
-    #chown -R qdrouterd:qdrouterd "$QDROUTERD_HOME"
+    set -- "$@" "--config" "$QDROUTERD_CONFIG_FILE"
 fi
 
 # else default to run whatever the user wanted like "bash"

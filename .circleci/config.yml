@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: scholzj/circleci-centos-amqp:latest
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Build Docker image
+          command: docker build -t scholzj/qpid-dispatch:travis .
+      - run:
+          name: Run tests
+          command: bats tests.bats
+      - deploy:
+          name: Login to Docker
+          command: docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - deploy:
+          name: Tag docker image
+          command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:devel
+      - deploy:
+          name: Push Docker image
+          command: docker push docker.io/scholzj/qpid-dispatch:devel
+      # - deploy:
+      #     name: Tag docker image
+      #     command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:0.21.0
+      # - deploy:
+      #     name: Push Docker image
+      #     command: docker push docker.io/scholzj/qpid-dispatch:0.21.0
+      # - deploy:
+      #     name: Tag Docker image
+      #     command: docker docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:latest
+      # - deploy:
+      #     name: Push Docker image
+      #     command: push docker.io/scholzj/qpid-dispatch:latest
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build:
+          context: docker-hub

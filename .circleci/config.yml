@@ -17,10 +17,10 @@ jobs:
           command: docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - deploy:
           name: Tag docker image
-          command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:1.1.0-rc4
+          command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:1.1.0-rc6
       - deploy:
           name: Push Docker image
-          command: docker push docker.io/scholzj/qpid-dispatch:1.1.0-rc4
+          command: docker push docker.io/scholzj/qpid-dispatch:1.1.0-rc3
       # - deploy:
       #     name: Tag Docker image
       #     command: docker docker tag -f scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:latest

@@ -197,7 +197,7 @@ EOS
 
             if [ $have_sasl -eq "1" ]; then
                 cat >> $QDROUTERD_CONFIG_FILE <<-EOS
-    saslConfigPath: $QDROUTERD_SASL_CONFIG_DIR
+    saslConfigDir: $QDROUTERD_SASL_CONFIG_DIR
     saslConfigName: $QDROUTERD_SASL_CONFIG_NAME
 EOS
             fi
@@ -308,7 +308,7 @@ EOS
 log {
      module: DEFAULT
      enable: $QDROUTERD_LOG_LEVEL
-     timestamp: true
+     includeTimestamp: true
 }
 EOS
 

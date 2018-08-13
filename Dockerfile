@@ -6,11 +6,11 @@ RUN groupadd -r qdrouterd && useradd -r -d /var/lib/qdrouterd -m -g qdrouterd qd
 
 # Install all dependencies
 RUN curl -o /etc/yum.repos.d/qpid-proton-stable.repo http://repo.effectivemessaging.com/qpid-proton-stable.repo \
-        && curl -o /etc/yum.repos.d/qpid-dispatch-devel.repo http://repo.effectivemessaging.com/qpid-dispatch-devel.repo \
+        && curl -o /etc/yum.repos.d/qpid-dispatch-stable.repo http://repo.effectivemessaging.com/qpid-dispatch-stable.repo \
         && yum -y --setopt=tsflag=nodocs install cyrus-sasl cyrus-sasl-plain cyrus-sasl-md5 openssl qpid-dispatch-router qpid-dispatch-router-docs qpid-dispatch-tools \
         && yum clean all
 
-ENV QDROUTERD_VERSION 1.3.0-SNAPSHOT
+ENV QDROUTERD_VERSION 1.3.0
 
 VOLUME /var/lib/qdrouterd
 

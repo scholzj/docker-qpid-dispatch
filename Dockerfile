@@ -10,7 +10,7 @@ RUN curl -o /etc/yum.repos.d/qpid-proton-devel.repo http://repo.effectivemessagi
         && yum -y --setopt=tsflag=nodocs install cyrus-sasl cyrus-sasl-plain cyrus-sasl-md5 openssl qpid-dispatch-router qpid-dispatch-router-docs qpid-dispatch-tools \
         && yum clean all
 
-ENV QDROUTERD_VERSION 1.4.0-SNAPSHOT
+ENV QDROUTERD_VERSION 1.4.0
 
 VOLUME /var/lib/qdrouterd
 

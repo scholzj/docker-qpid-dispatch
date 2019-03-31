@@ -1,5 +1,5 @@
 FROM	centos:centos7
-LABEL   maintainer="SvenDowideit@home.org.au" 
+LABEL   maintainer="www@scholzj.com" 
 
 # Add qpidd group / user
 RUN groupadd -r qdrouterd && useradd -r -d /var/lib/qdrouterd -m -g qdrouterd qdrouterd

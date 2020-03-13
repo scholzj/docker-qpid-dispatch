@@ -22,8 +22,8 @@ jobs:
           name: Push Docker image
           command: docker push docker.io/scholzj/qpid-dispatch:1.10.0
       - deploy:
-        name: Tag docker image
-        command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:latest
+          name: Tag docker image
+          command: docker tag scholzj/qpid-dispatch:travis docker.io/scholzj/qpid-dispatch:latest
       - deploy:
           name: Push Docker image
           command: docker push docker.io/scholzj/qpid-dispatch:latest
